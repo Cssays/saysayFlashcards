@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Concepts Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .flashcard-container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 400px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .front {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+        }
+
+        .back {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transform: rotateY(180deg);
+        }
+
+        .card-content {
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .front h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .front p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .back h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2b6cb0;
+            border-bottom: 2px solid #2b6cb0;
+            padding-bottom: 10px;
+        }
+
+        .back p, .back ul {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #2d3748;
+        }
+
+        .back ul {
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .back li {
+            margin: 8px 0;
+            padding-left: 10px;
+        }
+
+        .counter {
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .topic-indicator {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #4a5568;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .flashcard {
+                height: 350px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .btn, .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flashcard-container">
+        <div class="header">
+            <h1>Privacy Concepts Flashcards</h1>
+            <p>Click cards to flip • Navigate with arrows or buttons</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="shuffleCards()">🔀 Shuffle</button>
+            <button class="btn" onclick="resetProgress()">🔄 Reset</button>
+            <button class="btn" onclick="toggleAutoPlay()">⏯️ Auto Play</button>
+        </div>
+
+        <div class="counter">
+            Card <span id="current">1</span> of <span id="total">36</span>
+        </div>
+
+        <div class="flashcard">
+            <div class="card" id="flashcard" onclick="flipCard()">
+                <div class="card-face front">
+                    <div class="topic-indicator" id="topic-indicator"></div>
+                    <div class="card-content">
+                        <h2 id="question"></h2>
+                        <p style="margin-top: 20px; font-style: italic; color: #666;">Click to reveal answer</p>
+                    </div>
+                </div>
+                <div class="card-face back">
+                    <div class="card-content">
+                        <div id="answer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="previousCard()">← Previous</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <button class="nav-btn" id="nextBtn" onclick="nextCard()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        const flashcards = [
+            // Information Privacy Concepts Cards
+            {
+                topic: "Information Privacy Concepts",
+                question: "What is Information Privacy?",
+                answer: "<h3>Information Privacy</h3><p>Generally pertains to personally identifiable information (PII). It's considered an important aspect of information sharing that involves protecting personal information vulnerabilities in the digital age.</p>"
+            },
+            {
+                topic: "Information Privacy Concepts",
+                question: "What is Personally Identifiable Information (PII)?",
+                answer: "<h3>Personally Identifiable Information (PII)</h3><p>Information that can be used to distinguish or trace an individual's identity, including:</p><ul><li>Birth, race, religion, weight, activities, geographic indicators</li><li>Employment, medical, education, and financial information</li><li>Personal characteristics (photos, x-rays, fingerprints, biometrics)</li><li>Asset information (IP addresses, MAC addresses, static identifiers)</li></ul>"
+            },
+            {
+                topic: "Information Privacy Concepts",
+                question: "What are Privacy Requirements?",
+                answer: "<h3>Privacy Requirements</h3><p>System requirements that have privacy relevance. They define:</p><ul><li>Protection capabilities provided by the system</li><li>Performance and behavioral characteristics exhibited</li><li>Evidence used to determine requirement satisfaction</li></ul><p>Derived from laws, regulations, standards, and stakeholder expectations.</p>"
+            },
+            {
+                topic: "Information Privacy Concepts",
+                question: "What is a Privacy Risk Assessment?",
+                answer: "<h3>Privacy Risk Assessment</h3><p>The objective is to enable organization executives to determine an appropriate budget for privacy and implement privacy controls that optimize the level of protection within that budget.</p>"
+            },
+            {
+                topic: "Information Privacy Concepts",
+                question: "Distinguish between Security Controls and Privacy Controls",
+                answer: "<h3>Security vs Privacy Controls</h3><p><strong>Security Controls:</strong> Safeguards designed to protect confidentiality, integrity, and availability of information and meet security requirements.</p><p><strong>Privacy Controls:</strong> Technical, physical, and administrative measures to satisfy privacy requirements. Individual privacy cannot be achieved solely through securing PII - both are needed.</p>"
+            },
+
+            // Primary Privacy Issues Cards
+            {
+                topic: "Primary Privacy Issues",
+                question: "What are the three primary privacy issues in data collection and use?",
+                answer: "<h3>Three Primary Privacy Issues</h3><ul><li><strong>Accuracy</strong> - Responsibility of data collectors to ensure data correctness</li><li><strong>Property</strong> - Who owns the data</li><li><strong>Access</strong> - Responsibility of data holders to control who can use the data</li></ul>"
+            },
+            {
+                topic: "Primary Privacy Issues",
+                question: "Explain the 'Accuracy' privacy issue",
+                answer: "<h3>Accuracy Issue</h3><p>Relates to the responsibility of those who collect data to ensure that the data is correct. Data collectors must implement processes and controls to maintain data accuracy and correct any inaccuracies that may arise during collection, processing, or storage.</p>"
+            },
+            {
+                topic: "Primary Privacy Issues",
+                question: "Explain the 'Property' privacy issue",
+                answer: "<h3>Property Issue</h3><p>Relates to who owns the data. This involves questions about data ownership rights, who has control over personal information, and what rights individuals have over their own data versus the rights of organizations that collect and process it.</p>"
+            },
+            {
+                topic: "Primary Privacy Issues",
+                question: "Explain the 'Access' privacy issue",
+                answer: "<h3>Access Issue</h3><p>Relates to the responsibility of those who have data to control who can use that data. This includes implementing proper access controls, authorization mechanisms, and ensuring that only authorized individuals can access personal information.</p>"
+            },
+
+            // Privacy by Design Cards
+            {
+                topic: "Privacy by Design",
+                question: "What is Privacy by Design (PbD) and what is its goal?",
+                answer: "<h3>Privacy by Design (PbD)</h3><p>An approach that takes privacy requirements into account throughout the system development process, from conception through detailed design, implementation, and operation.</p><p><strong>Goal:</strong> Take privacy requirements into account throughout the system development process, from conception of a new IT system through detailed system design, implementation, and operation.</p>"
+            },
+            {
+                topic: "Privacy by Design",
+                question: "Describe the Privacy by Design Development Life Cycle",
+                answer: "<h3>PbD Development Life Cycle</h3><p>Major activities integrating information privacy protection into any information system:</p><ul><li><strong>Upper part:</strong> Design activities that determine what is needed and how to satisfy requirements</li><li><strong>Lower part:</strong> Implementation and operation of privacy features as part of the overall system</li></ul>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "List all 7 Foundational Principles of Privacy by Design",
+                answer: "<h3>7 Privacy by Design Principles</h3><p><em>First proposed by Ann Cavoukian and adopted by the 32nd Annual International Conference of Data Protection and Privacy Commissioners:</em></p><ul><li><strong>1. Proactive, not reactive</strong> - Preventive, not remedial</li><li><strong>2. Privacy as the default</strong> - Automatic protection</li><li><strong>3. Privacy embedded into design</strong> - Core function, not add-on</li><li><strong>4. Full functionality</strong> - Positive-sum, not zero-sum</li><li><strong>5. End-to-end security</strong> - Life cycle protection</li><li><strong>6. Visibility and transparency</strong> - Open operation</li><li><strong>7. Respect for user privacy</strong> - Personal control and choice</li></ul>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 1: 'Proactive, not reactive; preventive, not remedial'",
+                answer: "<h3>Principle 1: Proactive Approach</h3><p>PbD anticipates privacy issues and seeks to prevent problems before they arise. In this approach, designers must:</p><ul><li>Assess potential vulnerabilities in a system</li><li>Identify types of threats that may occur</li><li>Select technical and managerial controls to protect the system</li></ul><p>This is proactive prevention rather than reactive response to problems.</p>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 2: 'Privacy as the default'",
+                answer: "<h3>Principle 2: Privacy as Default</h3><p>This principle requires organizations to ensure that:</p><ul><li>Only data necessary to achieve specific purposes is processed</li><li>PII is protected during collection, storage, use, and transmission</li><li>Privacy protection is automatic without requiring action from the individual</li></ul><p>The maximum degree of privacy is delivered automatically.</p>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 3: 'Privacy embedded into the design'",
+                answer: "<h3>Principle 3: Embedded Privacy</h3><p>Privacy protections should be core, organic functions of the system, not features added after design completion. Key aspects:</p><ul><li>Privacy is integral to design and architecture of IT systems</li><li>Privacy is integral to business practices</li><li>Not an add-on after design is complete</li></ul><p>Privacy becomes a foundational component.</p>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 4: 'Full functionality - positive-sum, not zero-sum'",
+                answer: "<h3>Principle 4: Full Functionality</h3><p>Designers should seek solutions that avoid requiring trade-offs between:</p><ul><li>Privacy and system functionality</li><li>Privacy and security</li></ul><p>The goal is to achieve both privacy and functionality without sacrificing either. This is a positive-sum approach where all legitimate interests are accommodated.</p>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 5: 'End-to-end security—life cycle protection'",
+                answer: "<h3>Principle 5: End-to-End Security</h3><p>This principle encompasses two concepts:</p><ul><li><strong>End-to-end and life cycle:</strong> Protecting PII from collection through retention and destruction</li><li><strong>No gaps:</strong> No gaps in protection or accountability for data</li><li><strong>Security for privacy:</strong> Security processes and controls provide both security and privacy protection</li></ul>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 6: 'Visibility and transparency'",
+                answer: "<h3>Principle 6: Visibility and Transparency</h3><p>PbD seeks to assure users and stakeholders that:</p><ul><li>Privacy-related business practices are operating according to stated commitments</li><li>Technical controls are functioning as intended</li><li>Operations align with stated objectives</li></ul><p>All stakeholders can verify that privacy commitments are being met.</p>"
+            },
+            {
+                topic: "Privacy by Design Principles",
+                question: "Explain Principle 7: 'Respect for user privacy'",
+                answer: "<h3>Principle 7: User Privacy Respect</h3><p>Organizations must view privacy as primarily characterized by:</p><ul><li><strong>Personal control:</strong> Users have meaningful control over their information</li><li><strong>Free choice:</strong> Users can make informed decisions about data use</li></ul><p>Privacy is user-centric, requiring user-friendly options and strong privacy defaults.</p>"
+            },
+
+            // Aspect of Privacy Cards
+            {
+                topic: "Aspects of Privacy",
+                question: "What are the three primary privacy issues?",
+                answer: "<h3>Three Primary Privacy Issues</h3><ul><li><strong>Accuracy</strong> - Responsibility of data collectors to ensure data correctness</li><li><strong>Property</strong> - Who owns the data</li><li><strong>Access</strong> - Responsibility to control who can use the data</li></ul>"
+            },
+            {
+                topic: "Aspects of Privacy",
+                question: "What is Information Privacy and why is it important?",
+                answer: "<h3>Information Privacy</h3><p>An important aspect of information sharing that involves protecting personal information vulnerabilities. It includes regulations for companies to protect data and uses measures like encryption, authentication, and data masking to ensure information is available only to authorized users.</p>"
+            },
+            {
+                topic: "Aspects of Privacy",
+                question: "What types of privacy does Information Privacy relate to?",
+                answer: "<h3>Types of Information Privacy</h3><ul><li><strong>Internet Privacy</strong> - Personal data shared online, covered by website privacy policies</li><li><strong>Financial Privacy</strong> - Particularly sensitive as it can be used for fraud</li><li><strong>Medical Privacy</strong> - Subject to stringent laws requiring security and authentication systems</li></ul>"
+            },
+            {
+                topic: "Aspects of Privacy",
+                question: "What protective measures are used in Information Privacy?",
+                answer: "<h3>Protective Measures</h3><p>Measures are geared toward preventing data mining and unauthorized use of personal information. These include encryption, authentication, data masking, and compliance with data protection regulations that are expanding worldwide.</p>"
+            },
+
+            // Data Privacy vs Data Security Cards
+            {
+                topic: "Privacy vs Security",
+                question: "What is the main difference between Data Privacy and Data Security?",
+                answer: "<h3>Privacy vs Security</h3><p><strong>Data Security:</strong> Protects data from malicious threats, focusing on preventing unauthorized access, alteration, or disclosure.</p><p><strong>Data Privacy:</strong> Protects identity and focuses on responsible data use, proper handling, and compliance with regulations.</p><p><em>Key: Security protects data, Privacy protects identity.</em></p>"
+            },
+            {
+                topic: "Privacy vs Security",
+                question: "How are Data Privacy and Data Security related?",
+                answer: "<h3>Privacy-Security Relationship</h3><p>Privacy concerns are impossible to address without first employing effective security practices. Security controls can be met without satisfying privacy considerations, but privacy requires security as a foundation. They work together but address different aspects of protection.</p>"
+            },
+            {
+                topic: "Privacy vs Security",
+                question: "What does Data Privacy focus on?",
+                answer: "<h3>Data Privacy Focus</h3><p>Data privacy focuses on:</p><ul><li>Rights of individuals</li><li>Purpose of data collection and processing</li><li>Privacy preferences</li><li>How organizations govern personal data</li><li>Compliance with data protection regulations</li><li>How to collect, process, share, archive, and delete data legally</li></ul>"
+            },
+            {
+                topic: "Privacy vs Security",
+                question: "What does Data Security focus on?",
+                answer: "<h3>Data Security Focus</h3><p>Data security includes standards and safeguards to prevent unauthorized access and protect against:</p><ul><li><strong>Data breaches</strong> - Unauthorized disclosure of confidential information</li><li><strong>Cyberattacks</strong> - Stealing data through ransomware, hacking, etc.</li></ul><p>Uses tools like firewalls, user authentication, network limitations, and internal security practices.</p>"
+            },
+            {
+                topic: "Privacy vs Security",
+                question: "What is the CIA Triad in Data Security?",
+                answer: "<h3>CIA Triad</h3><p>A model guiding information security policies with three crucial components:</p><ul><li><strong>Confidentiality</strong> - Data accessed only by authorized individuals</li><li><strong>Integrity</strong> - Information is reliable and accurate</li><li><strong>Availability</strong> - Data is accessible to satisfy business needs</li></ul>"
+            },
+
+            // Elements of Data Privacy Cards
+            {
+                topic: "Privacy Elements",
+                question: "What are the three key elements of Data Privacy?",
+                answer: "<h3>Three Key Elements of Data Privacy</h3><ul><li><strong>Individual Rights</strong> - Right to be left alone and have control over their data</li><li><strong>Proper Procedures</strong> - For handling, processing, collecting, and sharing personal data</li><li><strong>Legal Compliance</strong> - Compliance with data protection laws</li></ul>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What is Data Management and why is it important for privacy?",
+                answer: "<h3>Data Management</h3><p>The process of ingesting, storing, organizing, and maintaining data created and collected by an organization. Data management is at the heart of privacy because data encompasses such a wide range of information and proper management ensures privacy protection throughout the data lifecycle.</p>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What is Personal Data/PII?",
+                answer: "<h3>Personal Data/PII</h3><p><strong>Personal Data:</strong> Any information from which an individual's identity is apparent or can be directly ascertained.</p><p><strong>PII (Personally Identifiable Information):</strong> Information that can distinguish or trace an individual's identity, including birth data, biometrics, IP addresses, medical/financial information, and asset information.</p>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What are Privacy Controls?",
+                answer: "<h3>Privacy Controls</h3><p>Technical, physical, and administrative measures employed to satisfy privacy requirements. They can:</p><ul><li>Remove threat sources</li><li>Change likelihood of threat exploitation by reducing vulnerabilities</li><li>Change consequences of privacy events</li></ul><p>Both security and privacy controls are needed for complete protection.</p>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What is Privacy Engineering?",
+                answer: "<h3>Privacy Engineering</h3><p>Takes account of privacy during the entire lifecycle of ICT systems. It focuses on implementing techniques that decrease privacy risks and enables purposeful decisions about resource allocation and control implementation.</p><p><strong>Goals:</strong> Incorporate functionality to satisfy requirements, prevent PII compromise, and mitigate breach impact.</p>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What is a Privacy Impact Assessment (PIA)?",
+                answer: "<h3>Privacy Impact Assessment (PIA)</h3><p>An analysis of how information is handled to:</p><ul><li>Ensure compliance with legal, regulatory, and policy requirements</li><li>Determine risks and effects of collecting and maintaining data</li><li>Examine protections and alternative processes</li><li>Mitigate potential privacy risks</li></ul><p>Consists of privacy risk assessment followed by control selection.</p>"
+            },
+            {
+                topic: "Privacy Elements",
+                question: "What is the Risk Management Cycle in Privacy?",
+                answer: "<h3>4-Step Risk Management Cycle</h3><ul><li><strong>Assess Risk</strong> - Based on assets, threats, vulnerabilities, existing controls</li><li><strong>Identify Controls</strong> - Prioritize and select security controls</li><li><strong>Implement</strong> - Allocate resources, roles, responsibilities</li><li><strong>Monitor</strong> - Evaluate risk treatment effectiveness</li></ul><p>This is an iterative, continuous process.</p>"
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let isAutoPlaying = false;
+        let autoPlayInterval;
+
+        function updateCard() {
+            const card = flashcards[currentCardIndex];
+            document.getElementById('question').textContent = card.question;
+            document.getElementById('answer').innerHTML = card.answer;
+            document.getElementById('topic-indicator').textContent = card.topic;
+            document.getElementById('current').textContent = currentCardIndex + 1;
+            document.getElementById('total').textContent = flashcards.length;
+            
+            // Reset flip state
+            document.getElementById('flashcard').classList.remove('flipped');
+            isFlipped = false;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
+            document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
+            
+            // Update progress bar
+            const progress = ((currentCardIndex + 1) / flashcards.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcards.length - 1) {
+                currentCardIndex++;
+                updateCard();
+            }
+        }
+
+        function previousCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+            }
+        }
+
+        function shuffleCards() {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentCardIndex = 0;
+            updateCard();
+        }
+
+        function resetProgress() {
+            currentCardIndex = 0;
+            updateCard();
+        }
+
+        function toggleAutoPlay() {
+            if (isAutoPlaying) {
+                clearInterval(autoPlayInterval);
+                isAutoPlaying = false;
+            } else {
+                autoPlayInterval = setInterval(() => {
+                    if (!isFlipped) {
+                        flipCard();
+                    } else {
+                        if (currentCardIndex < flashcards.length - 1) {
+                            nextCard();
+                        } else {
+                            currentCardIndex = 0;
+                            updateCard();
+                        }
+                    }
+                }, 3000);
+                isAutoPlaying = true;
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowLeft':
+                    previousCard();
+                    break;
+                case 'ArrowRight':
+                case ' ':
+                    if (isFlipped) {
+                        nextCard();
+                    } else {
+                        flipCard();
+                    }
+                    break;
+                case 'ArrowUp':
+                case 'ArrowDown':
+                    flipCard();
+                    break;
+            }
+        });
+
+        // Initialize first card
+        updateCard();
+    </script>
+</body>
+</html>
